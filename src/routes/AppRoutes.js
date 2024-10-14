@@ -1,33 +1,16 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import HomePage from "../components/HomePage";
-import Auth from "../components/Auth";
-import Header from "../components/commons/Header";
-import Footer from "../components/commons/Footer";
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import HomePage from '../components/HomePage';
+import ApartmentRoutes from '../components/modules/ApartmentManagement/routes';
 
-const Layout = ({ children }) => {
-  const location = useLocation();
-  const isLoginPage = location.pathname === "/login";
-
-  return (
-    <>
-      {!isLoginPage && <Header />}
-      <div>{children}</div>
-      {!isLoginPage && <Footer />}
-    </>
-  );
-};
 
 const AppRoutes = () => {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<Auth />} />
-          <Route path="/homepage" element={<HomePage />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/apartments/*" element={<ApartmentRoutes />} /> {/* Module Apartment Management */}
+
+    </Routes>
   );
 };
 

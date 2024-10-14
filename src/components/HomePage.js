@@ -1,54 +1,24 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from 'react';
+import Sidebar from './commons/SideBar'; 
+import ApartmentList from './modules/ApartmentManagement/ApartmentList';  
+import Footer from '../components/commons/Footer';
 
-const HomePage = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    // Lấy token từ localStorage
-    const token = localStorage.getItem("token");
-
-    // Nếu không có token, điều hướng người dùng đến trang đăng nhập
-    if (!token) {
-      window.location.href = "/login";
-    } else {
-      // Gọi API để lấy dữ liệu và sử dụng token
-      axios
-        .get("http://localhost:5000/homepage-data", {
-          headers: {
-            Authorization: `Bearer ${token}`, // Gửi token trong header Authorization
-          },
-        })
-        .then((response) => {
-          setData(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setLoading(false);
-        });
-    }
-  }, []);
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
-  }
-
+const HomePage = ({ setIsAuthenticated }) => { // Nhận setIsAuthenticated từ props
   return (
-    <div className="homepage">
-      <h1>Home Page</h1>
-      {data && (
-        <div>
-          <h2>Welcome, {data.username}</h2>
-          
+    <div className="flex flex-col h-screen">
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <Sidebar />
+
+        {/* Main Content */}
+        <div className="flex-1 p-8 bg-gray-100 overflow-y-auto">
+          <ApartmentList />
         </div>
-      )}
+      </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

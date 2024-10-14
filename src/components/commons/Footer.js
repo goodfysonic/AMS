@@ -2,35 +2,33 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-white py-8 font-sans">
+    <footer style={{ backgroundColor: '#469FD1', color: 'white', padding: '18px 32px' }}> 
       <div className="max-w-6xl mx-auto px-4">
-        <div className="flex flex-wrap justify-between">
-          <div className="w-full sm:w-1/2 md:w-1/4 lg:w-1/4 mb-6">
-            <h3 className="text-lg font-semibold mb-4">Về AMS</h3>
-            <p className="text-sm">
-              AMS là hệ thống quản lý căn hộ hiện đại, giúp tối ưu hóa quá trình quản lý và nâng cao trải nghiệm của cư dân.
-            </p>
+        <div className="flex justify-between gap-16 text-sm">
+          <div className="w-full sm:w-1/3 mb-4">
+            <h3 className="font-semibold">About AMS</h3>
+            <p>AMS is a modern apartment management system, designed to streamline management processes and improve resident experiences.</p>
           </div>
-          <div className="w-full sm:w-1/2 md:w-1/4 lg:w-1/4 mb-6">
-            <h3 className="text-lg font-semibold mb-4">Liên hệ</h3>
-            <ul className="text-sm">
-              <li className="mb-2">Email: info@ams.com</li>
-              <li className="mb-2">Điện thoại: (84) 123-456-789</li>
-              <li>Địa chỉ: 123 Đường ABC, Quận XYZ, TP.HCM</li>
+          <div className="w-full sm:w-1/3 mb-4">
+            <h3 className="font-semibold">Contact Us</h3>
+            <ul>
+              <li>Email: info@ams.com</li>
+              <li>Phone: (84) 123-456-789</li>
+              <li>Address: 123 ABC Street, XYZ District, HCMC</li>
             </ul>
           </div>
-          <div className="w-full sm:w-1/2 md:w-1/4 lg:w-1/4 mb-6">
-            <h3 className="text-lg font-semibold mb-4">Liên kết nhanh</h3>
-            <ul className="text-sm">
-              <li className="mb-2"><a href="#" className="hover:underline">Trang chủ</a></li>
-              <li className="mb-2"><a href="#" className="hover:underline">Dịch vụ</a></li>
-              <li className="mb-2"><a href="#" className="hover:underline">Tin tức</a></li>
-              <li><a href="#" className="hover:underline">Liên hệ</a></li>
+          <div className="w-full sm:w-1/3 mb-4">
+            <h3 className="font-semibold">Quick Links</h3>
+            <ul>
+              <li><a href="#" className="hover:underline">Home</a></li>
+              <li><a href="#" className="hover:underline">Services</a></li>
+              <li><a href="#" className="hover:underline">News</a></li>
+              <li><a href="#" className="hover:underline">Contact</a></li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-700 mt-8 pt-8 text-sm text-center">
-          <p>&copy; {new Date().getFullYear()} AMS - Apartment Management System. Bảo lưu mọi quyền.</p>
+        <div className="text-center mt-4 text-xs">
+          <p>&copy; {new Date().getFullYear()} AMS - Apartment Management System. All rights reserved.</p>
         </div>
       </div>
     </footer>

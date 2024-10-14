@@ -1,12 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
+import { BrowserRouter as Router } from 'react-router-dom';
 import AppRoutes from "./routes/AppRoutes";
-import './App.css';
+import Auth from './components/Auth';
+import Header from './components/commons/Header';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   return (
-    <div className="App">
-      <AppRoutes />
-    </div>
+    <Router>
+      <div className="App">
+        {isAuthenticated ? (
+          <>
+            <Header setIsAuthenticated={setIsAuthenticated} /> 
+            <AppRoutes />
+          </>
+        ) : (
+          <Auth setIsAuthenticated={setIsAuthenticated} />  
+        )}
+      </div>
+    </Router>
   );
 }
 

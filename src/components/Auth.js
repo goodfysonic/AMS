@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import Particle from "./Particle";
 import Logo from "../assets/Logo.png";
 
-function Auth() {
+function Auth({ setIsAuthenticated }) {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +17,6 @@ function Auth() {
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
 
-  // Gọi API đăng nhập từ Swagger
   const authorize = async () => {
     try {
       const res = await axios.post(
@@ -28,21 +27,23 @@ function Auth() {
         }),
         {
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json",
           },
         }
       );
   
-      if (res.status === 200 && res.data.status === 0) {
+      if (res.status === 200 ) {
         localStorage.setItem("token", res.data.token);
-        navigate("/homepage", { replace: true });
+        setIsAuthenticated(true); // Cập nhật trạng thái đăng nhập
+        navigate("/");  // Điều hướng đến trang chính
+        toast.success("Successfully authorized");
       } else {
-        toast.error("Lỗi: Sai thông tin đăng nhập");
+        toast.error("Error: Login information failed");
       }
     } catch (error) {
       toast.error(`Error: ${error.response ? error.response.data : error.message}`);
     }
-  };  
+  };
 
   const validateForm = () => {
     let isValid = true;
@@ -74,7 +75,7 @@ function Auth() {
     setPassword(passEl.current.value);
 
     if (validateForm()) {
-      authorize(); // Gọi hàm đăng nhập
+      authorize();
     }
   };
 
