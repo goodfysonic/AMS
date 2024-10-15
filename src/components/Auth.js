@@ -20,30 +20,34 @@ function Auth({ setIsAuthenticated }) {
   const authorize = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:8081/global/auth/token",
+        "http://localhost:8080/identity/global/auth/token",
         new URLSearchParams({
-          username: userId,
-          password: password,
+          username: 'apartment',
+          password: 'apartment',
         }),
         {
           headers: {
-            "Accept": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       );
   
-      if (res.status === 200 ) {
+      if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
-        setIsAuthenticated(true); // Cập nhật trạng thái đăng nhập
-        navigate("/");  // Điều hướng đến trang chính
+        setIsAuthenticated(true);  // Đánh dấu người dùng đã đăng nhập
+        navigate("/");  // Điều hướng về trang chính
         toast.success("Successfully authorized");
+        console.log("Successfully");
       } else {
         toast.error("Error: Login information failed");
+        console.log("failed");
       }
     } catch (error) {
       toast.error(`Error: ${error.response ? error.response.data : error.message}`);
+      console.log("failed 2");
     }
   };
+  
 
   const validateForm = () => {
     let isValid = true;

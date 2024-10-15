@@ -10,8 +10,7 @@ const ApartmentList = () => {
   const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
 
-  // Sử dụng đúng biến môi trường
-  const API_URL = process.env.REACT_APP_SERVER1;
+  const API_URL = process.env.REACT_APP_SERVER || 'http://localhost:8080';
 
   useEffect(() => {
     fetchApartments();
@@ -20,15 +19,21 @@ const ApartmentList = () => {
   const fetchApartments = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token'); // Lấy token từ localStorage
-      const response = await axios.get(`${API_URL}/api/master/apartments`, {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found');
+      }
+      
+      const response = await axios.get(`${API_URL}/master/api/apartments`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Thêm token vào header
+          Authorization: `Bearer ${token}`,
         },
       });
-      setApartments(response.data); // Gán dữ liệu căn hộ từ API
+      console.log('API Response:', response.data);
+      setApartments(response.data);
     } catch (error) {
-      message.error('Failed to fetch apartments');
+      console.error('Error fetching apartments:', error);
+      message.error('Failed to fetch apartments: ' + error.message);
     }
     setLoading(false);
   };
@@ -38,13 +43,14 @@ const ApartmentList = () => {
       const token = localStorage.getItem('token');
       await axios.delete(`${API_URL}/api/master/apartments/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Thêm token vào header
+          Authorization: `Bearer ${token}`,
         },
       });
       message.success('Apartment deleted');
       fetchApartments();
     } catch (error) {
-      message.error('Failed to delete apartment');
+      console.error('Error deleting apartment:', error);
+      message.error('Failed to delete apartment: ' + error.message);
     }
   };
 
@@ -55,26 +61,26 @@ const ApartmentList = () => {
       );
       setApartments(filteredApartments);
     } else {
-      fetchApartments(); // Nếu không có tìm kiếm, load lại danh sách
+      fetchApartments();
     }
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id' },
+    { title: 'ID', dataIndex: 'apartment_id', key: 'apartment_id' },
     { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Floor', dataIndex: 'floor', key: 'floor' },
+    { title: 'Floor', dataIndex: 'floor.floor_number', key: 'floor' },
     { title: 'Area', dataIndex: 'area', key: 'area' },
-    { title: 'Purchase price', dataIndex: 'purchasePrice', key: 'purchasePrice' },
-    { title: 'Rental price', dataIndex: 'rentalPrice', key: 'rentalPrice' },
-    { title: 'Rental type', dataIndex: 'rentalType', key: 'rentalType' },
+    { title: 'Purchase price', dataIndex: 'purchase_price', key: 'purchase_price' },
+    { title: 'Rental price', dataIndex: 'rental_price', key: 'rental_price' },
+    { title: 'Rental type', dataIndex: 'rental_type', key: 'rental_type' },
     { title: 'Status', dataIndex: 'status', key: 'status' },
     {
       title: 'Action',
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => navigate(`/apartments/edit/${record.id}`)}>Edit</Button>
-          <Button type="link" danger onClick={() => handleDelete(record.id)}>Delete</Button>
+          <Button type="link" onClick={() => navigate(`/apartments/edit/${record.apartment_id}`)}>Edit</Button>
+          <Button type="link" danger onClick={() => handleDelete(record.apartment_id)}>Delete</Button>
         </Space>
       ),
     },
@@ -84,7 +90,7 @@ const ApartmentList = () => {
     <div className="p-4 bg-white rounded-md shadow-md">
       <div className="flex justify-between mb-4">
         <Input
-          placeholder="Apartment"
+          placeholder="Search Apartment"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           style={{ width: 200 }}
@@ -121,7 +127,7 @@ const ApartmentList = () => {
         dataSource={apartments}
         columns={columns}
         loading={loading}
-        rowKey="id"
+        rowKey="apartment_id"
         pagination={{ pageSize: 5 }}
         bordered
       />

@@ -5,7 +5,7 @@ function Header({ setIsAuthenticated }) {
   const navigate = useNavigate();
   
   const logoutHandler = () => {
-    localStorage.clear();
+    localStorage.removeItem('token');
     setIsAuthenticated(false);
     navigate('/login');
   };
