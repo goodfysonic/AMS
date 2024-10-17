@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, useNavigate, Route, Routes } from 'react-router-dom';
 import AppRoutes from "./routes/AppRoutes";
 import Auth from './components/Auth';
 import Header from './components/commons/Header';
@@ -12,22 +12,31 @@ function App() {
     const token = localStorage.getItem('token');
     if (token) {
       setIsAuthenticated(true);
-      navigate('/'); // Điều hướng về trang chủ nếu đã đăng nhập
     } else {
       setIsAuthenticated(false);
       navigate('/login'); // Điều hướng đến trang login nếu chưa đăng nhập
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+    navigate('/login'); // Điều hướng sau khi đăng xuất
+  };
 
   return (
     <div className="App">
       {isAuthenticated ? (
         <>
-          <Header setIsAuthenticated={setIsAuthenticated} /> 
+          <Header setIsAuthenticated={setIsAuthenticated} onLogout={handleLogout} /> 
           <AppRoutes />
         </>
       ) : (
-        <Auth setIsAuthenticated={setIsAuthenticated} />  
+        <Routes>
+          <Route path="/login" element={<Auth setIsAuthenticated={setIsAuthenticated} />} />
+          {/* Nếu không phải đường dẫn /login thì điều hướng về login */}
+          <Route path="*" element={<Auth setIsAuthenticated={setIsAuthenticated} />} />
+        </Routes>
       )}
     </div>
   );

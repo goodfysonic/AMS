@@ -34,8 +34,8 @@ function Auth({ setIsAuthenticated }) {
   
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
-        setIsAuthenticated(true);  // Đánh dấu người dùng đã đăng nhập
-        navigate("/");  // Điều hướng về trang chính
+        setIsAuthenticated(true);  
+        navigate("/apartments");  
         toast.success("Successfully authorized");
         console.log("Successfully");
       } else {

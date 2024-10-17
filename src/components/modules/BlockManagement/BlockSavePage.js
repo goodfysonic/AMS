@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { message } from 'antd';
+import { message, Spin } from 'antd';
 import axios from 'axios';
 import BlockForm from './BlockForm';
 
 const BlockSavePage = () => {
   const [block, setBlock] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { blockId } = useParams();
+  const [saving, setSaving] = useState(false);
+  const { blockId } = useParams(); // Lấy blockId từ URL
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_SERVER || 'http://localhost:8080';
 
   useEffect(() => {
-    if (blockId) {
+    if (blockId) { // Chỉ fetch dữ liệu khi có blockId (trường hợp chỉnh sửa)
       fetchBlock();
     }
   }, [blockId]);
@@ -19,35 +21,55 @@ const BlockSavePage = () => {
   const fetchBlock = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${process.env.REACT_APP_SERVER1}/api/master/blocks/${blockId}`);
-      setBlock(response.data);
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/master/api/blocks/${blockId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setBlock(response.data); // Lưu dữ liệu block vào state
     } catch (error) {
       message.error('Failed to fetch block');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleSubmit = async (values) => {
-    setLoading(true);
+    setSaving(true);
     try {
+      const token = localStorage.getItem('token');
       if (blockId) {
-        await axios.put(`${process.env.REACT_APP_SERVER1}/api/master/blocks/${blockId}`, values);
+        await axios.put(`${API_URL}/master/api/blocks/${blockId}`, values, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         message.success('Block updated successfully');
       } else {
-        await axios.post(`${process.env.REACT_APP_SERVER1}/api/master/blocks`, values);
+        await axios.post(`${API_URL}/master/api/blocks`, values, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         message.success('Block added successfully');
       }
       navigate('/blocks');
     } catch (error) {
       message.error('Failed to save block');
+    } finally {
+      setSaving(false);
     }
-    setLoading(false);
   };
+
+  if (blockId && loading) { 
+    return <Spin size="large" />;
+  }
 
   return (
     <div>
       <h2>{blockId ? 'Edit Block' : 'Add New Block'}</h2>
-      <BlockForm onSubmit={handleSubmit} initialValues={block || {}} />
+      <BlockForm onFinish={handleSubmit} initialValues={block || {}} loading={saving} />
     </div>
   );
 };

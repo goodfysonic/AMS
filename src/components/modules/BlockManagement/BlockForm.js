@@ -1,73 +1,55 @@
 import React from 'react';
-import { Form, Input, Button, Row, Col } from 'antd';
+import { Form, Input, InputNumber, Button } from 'antd';
 
-const BlockForm = ({ onSubmit, initialValues = {} }) => {
+const BlockForm = ({ initialValues, onFinish, loading }) => {
   const [form] = Form.useForm();
 
-  const handleFinish = (values) => {
-    onSubmit(values);
-  };
-
+  // Đảm bảo rằng initialValues được set cho form
   return (
-    <div className="p-6 bg-white shadow-md rounded-md">
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFinish}
-        initialValues={initialValues}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={onFinish}
+      initialValues={initialValues}  
+    >
+      <Form.Item
+        name="name"
+        label="Block Name"
+        rules={[{ required: true, message: 'Please input block name!' }]}
       >
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label="Name"
-              name="name"
-              rules={[{ required: true, message: 'Please enter block name' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+        <Input placeholder="Enter block name" />
+      </Form.Item>
 
-          <Col span={12}>
-            <Form.Item
-              label="Description"
-              name="description"
-              rules={[{ required: true, message: 'Please enter description' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+      <Form.Item
+        name="description"
+        label="Description"
+        rules={[{ required: true, message: 'Please input description!' }]}
+      >
+        <Input.TextArea rows={4} placeholder="Enter description" />
+      </Form.Item>
 
-          <Col span={12}>
-            <Form.Item
-              label="Number of Floors"
-              name="total_floor"
-              rules={[{ required: true, message: 'Please enter number of floors' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+      <Form.Item
+        name="total_apartment"
+        label="Total Apartments"
+        rules={[{ required: true, message: 'Please input total apartments!' }]}
+      >
+        <InputNumber min={0} placeholder="Enter total apartments" style={{ width: '100%' }} />
+      </Form.Item>
 
-          <Col span={12}>
-            <Form.Item
-              label="Number of Apartments"
-              name="total_apartment"
-              rules={[{ required: true, message: 'Please enter number of apartments' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
-        </Row>
+      <Form.Item
+        name="total_floor"
+        label="Total Floors"
+        rules={[{ required: true, message: 'Please input total floors!' }]}
+      >
+        <InputNumber min={0} placeholder="Enter total floors" style={{ width: '100%' }} />
+      </Form.Item>
 
-        <Form.Item className="text-center">
-          <Button type="default" danger className="mr-4" onClick={() => form.resetFields()}>
-            Cancel
-          </Button>
-          <Button type="primary" htmlType="submit">
-            Add
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
+      <Form.Item>
+        <Button type="primary" htmlType="submit" loading={loading}>
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 

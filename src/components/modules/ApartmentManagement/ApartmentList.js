@@ -23,14 +23,18 @@ const ApartmentList = () => {
       if (!token) {
         throw new Error('No token found');
       }
-      
+
       const response = await axios.get(`${API_URL}/master/api/apartments`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('API Response:', response.data);
-      setApartments(response.data);
+
+      if (Array.isArray(response.data.items)) {
+        setApartments(response.data.items);
+      } else {
+        throw new Error('Invalid response format');
+      }
     } catch (error) {
       console.error('Error fetching apartments:', error);
       message.error('Failed to fetch apartments: ' + error.message);
@@ -66,13 +70,10 @@ const ApartmentList = () => {
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'apartment_id', key: 'apartment_id' },
     { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Floor', dataIndex: 'floor.floor_number', key: 'floor' },
     { title: 'Area', dataIndex: 'area', key: 'area' },
-    { title: 'Purchase price', dataIndex: 'purchase_price', key: 'purchase_price' },
-    { title: 'Rental price', dataIndex: 'rental_price', key: 'rental_price' },
-    { title: 'Rental type', dataIndex: 'rental_type', key: 'rental_type' },
+    { title: 'Purchase Price', dataIndex: ['sale_info', 'purchase_price'], key: 'purchase_price' },
+    { title: 'Sale Date', dataIndex: ['sale_info', 'sale_date'], key: 'sale_date' },
     { title: 'Status', dataIndex: 'status', key: 'status' },
     {
       title: 'Action',
@@ -128,7 +129,7 @@ const ApartmentList = () => {
         columns={columns}
         loading={loading}
         rowKey="apartment_id"
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 10 }}
         bordered
       />
     </div>
