@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message, Spin } from 'antd';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const ApartmentSavePage = () => {
@@ -8,6 +8,8 @@ const ApartmentSavePage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const location = useLocation();
+  const { floorId } = location.state || {};
 
   const API_URL = 'http://localhost:8080/master/api';
 
@@ -45,13 +47,13 @@ const ApartmentSavePage = () => {
         });
         message.success('Apartment updated successfully');
       } else {
-        // Add new apartment
-        await axios.post(`${API_URL}/apartments`, values, {
+        // Add new apartment and associate with floorId
+        await axios.post(`${API_URL}/apartments`, { ...values, floorId }, {
           headers: { Authorization: `Bearer ${token}` },
         });
         message.success('Apartment added successfully');
       }
-      navigate('/floors/:floorId/apartments'); 
+      navigate(`/floors/${floorId}/apartments`); 
     } catch (error) {
       console.error('Failed to save apartment:', error);
       message.error('Failed to save apartment');

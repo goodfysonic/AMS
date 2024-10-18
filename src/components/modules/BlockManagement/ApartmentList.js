@@ -2,11 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Card, Button, List, Tag, Space, Spin, Typography, message } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { 
-  PlusOutlined, 
-  EditOutlined, 
-  DeleteOutlined 
-} from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 
@@ -74,7 +70,7 @@ const ApartmentList = () => {
               <Button 
                 type="primary" 
                 icon={<EditOutlined />} 
-                onClick={() => navigate(`/apartments/edit/${apartment.apartment_id}`)}
+                onClick={() => navigate(`/apartments/${apartment.apartment_id}/edit`)}
               >
                 Edit
               </Button>,
@@ -112,7 +108,7 @@ const ApartmentList = () => {
         <Button 
           type="primary" 
           icon={<PlusOutlined />} 
-          onClick={() => navigate('/apartments')}
+          onClick={() => navigate('/apartments/new')}
         >
           Add New Apartment
         </Button>

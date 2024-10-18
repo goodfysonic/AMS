@@ -3,10 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import BlockList from '../components/modules/BlockManagement/BlockList';
 import BlockRoutes from '../components/modules/BlockManagement/routes';
 import InvoiceRoutes from '../components/modules/InvoiceManagement/routes';
-import ApartmentRoutes from '../components/modules/ApartmentManagement/routes';
 import Sidebar from '../components/commons/SideBar'; 
 import Footer from '../components/commons/Footer'; 
-import ApartmentList from '../components/modules/ApartmentManagement/ApartmentList';
 
 const AppRoutes = () => {
   return (
@@ -17,7 +15,6 @@ const AppRoutes = () => {
           <Routes>
             <Route path="/" element={<BlockList />} />
             <Route path="/blocks/*" element={<BlockRoutes />} />
-            <Route path="/floors/:floorId/apartments/*" element={<ApartmentList />} />
             <Route path="/invoices/*" element={<InvoiceRoutes />} />
           </Routes>
         </div>

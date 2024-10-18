@@ -35,7 +35,7 @@ function Auth({ setIsAuthenticated }) {
       if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
         setIsAuthenticated(true);  
-        navigate("/blocks");  
+        navigate("/");  
         toast.success("Successfully authorized");
         console.log("Successfully");
       } else {

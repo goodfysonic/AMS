@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom';
 import BlockList from './BlockList';
 import BlockSavePage from './BlockSavePage';
 import FloorSavePage from './FloorSavePage';
+import ApartmentList from './ApartmentList';
+import ApartmentSavePage from './ApartmentSavePage';
 
 const BlockRoutes = () => {
   return (
@@ -15,6 +17,9 @@ const BlockRoutes = () => {
             <Route path="/edit/:blockId" element={<BlockSavePage />} />
             <Route path="/:blockId/floors/new" element={<FloorSavePage />} />
             <Route path="/:blockId/floors/edit/:floorId" element={<FloorSavePage />} />
+            <Route path="/floors/:floorId/apartments" element={<ApartmentList />} />
+            <Route path="/apartments/new" element={<ApartmentSavePage />} />
+            <Route path="/apartments/:id/edit" element={<ApartmentSavePage />} />
           </Routes>
         </div>
       </div>
