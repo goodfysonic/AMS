@@ -8,12 +8,12 @@ const BlockSavePage = () => {
   const [block, setBlock] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const { blockId } = useParams(); // Lấy blockId từ URL
+  const { blockId } = useParams();
   const navigate = useNavigate();
   const API_URL = process.env.REACT_APP_SERVER || 'http://localhost:8080';
 
   useEffect(() => {
-    if (blockId) { // Chỉ fetch dữ liệu khi có blockId (trường hợp chỉnh sửa)
+    if (blockId) {
       fetchBlock();
     }
   }, [blockId]);
@@ -27,7 +27,7 @@ const BlockSavePage = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setBlock(response.data); // Lưu dữ liệu block vào state
+      setBlock(response.data);
     } catch (error) {
       message.error('Failed to fetch block');
     } finally {
@@ -62,7 +62,7 @@ const BlockSavePage = () => {
     }
   };
 
-  if (blockId && loading) { 
+  if (blockId && loading) {
     return <Spin size="large" />;
   }
 

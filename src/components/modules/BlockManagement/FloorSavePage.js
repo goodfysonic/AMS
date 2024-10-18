@@ -8,7 +8,7 @@ const FloorSavePage = () => {
   const [floor, setFloor] = useState(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const { blockId, floorId } = useParams();
+  const { floorId } = useParams();
   const navigate = useNavigate();
   const API_URL = process.env.REACT_APP_SERVER || 'http://localhost:8080';
 
@@ -22,8 +22,10 @@ const FloorSavePage = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/api/floors/${floorId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await axios.get(`${API_URL}/master/api/floors/${floorId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       setFloor(response.data);
     } catch (error) {
@@ -38,17 +40,21 @@ const FloorSavePage = () => {
     try {
       const token = localStorage.getItem('token');
       if (floorId) {
-        await axios.put(`${API_URL}/api/floors/${floorId}`, values, {
-          headers: { Authorization: `Bearer ${token}` },
+        await axios.put(`${API_URL}/master/api/floors/${floorId}`, values, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         message.success('Floor updated successfully');
       } else {
-        await axios.post(`${API_URL}/api/blocks/${blockId}/floors`, values, {
-          headers: { Authorization: `Bearer ${token}` },
+        await axios.post(`${API_URL}/master/api/floors`, values, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         message.success('Floor added successfully');
       }
-      navigate(`/blocks/${blockId}/floors`);
+      navigate('/blocks');
     } catch (error) {
       message.error('Failed to save floor');
     } finally {
@@ -56,7 +62,7 @@ const FloorSavePage = () => {
     }
   };
 
-  if (loading) {
+  if (floorId && loading) {
     return <Spin size="large" />;
   }
 

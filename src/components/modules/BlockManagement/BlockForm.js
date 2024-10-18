@@ -4,13 +4,12 @@ import { Form, Input, InputNumber, Button } from 'antd';
 const BlockForm = ({ initialValues, onFinish, loading }) => {
   const [form] = Form.useForm();
 
-  // Đảm bảo rằng initialValues được set cho form
   return (
     <Form
       form={form}
       layout="vertical"
       onFinish={onFinish}
-      initialValues={initialValues}  
+      initialValues={initialValues}
     >
       <Form.Item
         name="name"

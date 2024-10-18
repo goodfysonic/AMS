@@ -1,137 +1,127 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Button, message, Input, Space } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Card, Button, List, Tag, Space, Spin, Typography, message } from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { SearchOutlined, FileExcelOutlined, PlusOutlined } from '@ant-design/icons';
+import { 
+  PlusOutlined, 
+  EditOutlined, 
+  DeleteOutlined 
+} from '@ant-design/icons';
+
+const { Title } = Typography;
 
 const ApartmentList = () => {
   const [apartments, setApartments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
+  const { floorId } = useParams();
 
-  const API_URL = process.env.REACT_APP_SERVER || 'http://localhost:8080';
+  const API_URL = 'http://localhost:8080/master/api'; 
 
-  useEffect(() => {
-    fetchApartments();
-  }, []);
-
-  const fetchApartments = async () => {
+  // Fetch apartments by floorId
+  const fetchApartments = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No token found');
-      }
-
-      const response = await axios.get(`${API_URL}/master/api/apartments`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await axios.get(`${API_URL}/floors/${floorId}/apartments`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (Array.isArray(response.data.items)) {
-        setApartments(response.data.items);
-      } else {
-        throw new Error('Invalid response format');
-      }
+      setApartments(response.data);
+      message.success('Apartments fetched successfully');
     } catch (error) {
       console.error('Error fetching apartments:', error);
-      message.error('Failed to fetch apartments: ' + error.message);
+      message.error('Failed to fetch apartments');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
+  }, [API_URL, floorId]);
 
-  const handleDelete = async (id) => {
+  useEffect(() => {
+    fetchApartments();
+  }, [fetchApartments]);
+
+  const deleteApartment = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/api/master/apartments/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.delete(`${API_URL}/apartments/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      message.success('Apartment deleted');
+      message.success('Apartment deleted successfully');
       fetchApartments();
     } catch (error) {
       console.error('Error deleting apartment:', error);
-      message.error('Failed to delete apartment: ' + error.message);
+      message.error('Failed to delete apartment');
     }
   };
 
-  const handleSearch = () => {
-    if (searchText) {
-      const filteredApartments = apartments.filter(apartment =>
-        apartment.name.toLowerCase().includes(searchText.toLowerCase())
-      );
-      setApartments(filteredApartments);
-    } else {
-      fetchApartments();
+  const getApartmentStatusColor = (status) => {
+    switch (status.toUpperCase()) {
+      case 'AVAILABLE': return 'green';
+      case 'RENTED': return 'red';
+      case 'SOLD': return 'orange';
+      default: return 'default';
     }
   };
 
-  const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Area', dataIndex: 'area', key: 'area' },
-    { title: 'Purchase Price', dataIndex: ['sale_info', 'purchase_price'], key: 'purchase_price' },
-    { title: 'Sale Date', dataIndex: ['sale_info', 'sale_date'], key: 'sale_date' },
-    { title: 'Status', dataIndex: 'status', key: 'status' },
-    {
-      title: 'Action',
-      key: 'actions',
-      render: (_, record) => (
-        <Space>
-          <Button type="link" onClick={() => navigate(`/apartments/edit/${record.apartment_id}`)}>Edit</Button>
-          <Button type="link" danger onClick={() => handleDelete(record.apartment_id)}>Delete</Button>
-        </Space>
-      ),
-    },
-  ];
+  const renderApartmentRow = () => {
+    return (
+      <List
+        itemLayout="horizontal"
+        dataSource={apartments}
+        renderItem={apartment => (
+          <List.Item
+            actions={[
+              <Button 
+                type="primary" 
+                icon={<EditOutlined />} 
+                onClick={() => navigate(`/apartments/edit/${apartment.apartment_id}`)}
+              >
+                Edit
+              </Button>,
+              <Button 
+                type="danger" 
+                icon={<DeleteOutlined />} 
+                onClick={() => deleteApartment(apartment.apartment_id)}
+              >
+                Delete
+              </Button>
+            ]}
+          >
+            <List.Item.Meta
+              title={`Apartment ${apartment.name || 'undefined'}`}
+              description={
+                <>
+                  <div>Area: {apartment.area} sqm</div>
+                  <div>Rental Price: ${apartment.rental_info?.rental_price || 'N/A'}</div>
+                  <Tag color={getApartmentStatusColor(apartment.status)}>
+                    {apartment.status}
+                  </Tag>
+                </>
+              }
+            />
+          </List.Item>
+        )}
+      />
+    );
+  };
 
   return (
-    <div className="p-4 bg-white rounded-md shadow-md">
-      <div className="flex justify-between mb-4">
-        <Input
-          placeholder="Search Apartment"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: 200 }}
-          prefix={<SearchOutlined />}
-        />
-        <Space>
-          <Button
-            type="primary"
-            icon={<SearchOutlined />}
-            onClick={handleSearch}
-            style={{ backgroundColor: '#469FD1', borderColor: '#469FD1' }}
-          >
-            Search
-          </Button>
-          <Button
-            icon={<FileExcelOutlined />}
-            onClick={() => message.info('Export Excel functionality not implemented')}
-            style={{ color: '#469FD1', borderColor: '#469FD1' }}
-          >
-            Export Excel
-          </Button>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => navigate('/apartments/new')}
-            style={{ backgroundColor: '#469FD1', borderColor: '#469FD1' }}
-          >
-            Add New
-          </Button>
-        </Space>
+    <div className="p-4">
+      <div className="mb-4 flex justify-between items-center">
+        <Title level={4}>Apartment List</Title>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          onClick={() => navigate('/apartments')}
+        >
+          Add New Apartment
+        </Button>
       </div>
-
-      <Table
-        dataSource={apartments}
-        columns={columns}
-        loading={loading}
-        rowKey="apartment_id"
-        pagination={{ pageSize: 10 }}
-        bordered
-      />
+      {loading ? (
+        <Spin tip="Loading apartments..." />
+      ) : (
+        renderApartmentRow()
+      )}
     </div>
   );
 };

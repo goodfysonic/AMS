@@ -34,7 +34,6 @@ function App() {
       ) : (
         <Routes>
           <Route path="/login" element={<Auth setIsAuthenticated={setIsAuthenticated} />} />
-          {/* Nếu không phải đường dẫn /login thì điều hướng về login */}
           <Route path="*" element={<Auth setIsAuthenticated={setIsAuthenticated} />} />
         </Routes>
       )}

@@ -6,7 +6,7 @@ const Sidebar = () => {
   return (
     <div className="w-64 bg-white shadow-md">
       <nav className="mt-6">
-        <SidebarItem icon={<Home size={20} />} text="Apartment Management" to="/apartments" active />
+        <SidebarItem icon={<Home size={20} />} text="Block Management" to="/blocks" active />
         <SidebarItem icon={<FileText size={20} />} text="Invoice Management" to="/invoices" />
         <SidebarItem icon={<Settings size={20} />} text="Service Management" to="/services" />
         <SidebarItem icon={<Clipboard size={20} />} text="Contract Management" to="/contracts" />
