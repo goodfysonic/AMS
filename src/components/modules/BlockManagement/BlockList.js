@@ -1,17 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Button, Collapse, List, Tag, Space, Spin, Typography, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { PlusOutlined, HomeOutlined, BuildOutlined, CaretRightOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import { 
-  PlusOutlined, 
-  EditOutlined, 
-  HomeOutlined,
-  BuildOutlined,
-  CaretRightOutlined 
-} from '@ant-design/icons';
-
 const { Panel } = Collapse;
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 const BlockList = () => {
   const [blocks, setBlocks] = useState([]);
@@ -30,22 +23,27 @@ const BlockList = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBlocks(response.data);
-
-      // Fetch floors for all blocks initially
-      for (const block of response.data) {
-        const floorsResponse = await axios.get(`${API_URL}/blocks/${block.block_id}/floors`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setFloors(prev => ({ 
-          ...prev, 
-          [block.block_id]: floorsResponse.data 
-        }));
-      }
     } catch (error) {
       console.error('Error:', error);
-      message.error('Failed to fetch data');
+      message.error('Failed to fetch blocks');
     } finally {
       setLoading(false);
+    }
+  }, [API_URL]);
+
+  const fetchFloors = useCallback(async (blockId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const floorsResponse = await axios.get(`${API_URL}/blocks/${blockId}/floors`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFloors(prev => ({ 
+        ...prev, 
+        [blockId]: floorsResponse.data 
+      }));
+    } catch (error) {
+      console.error('Error:', error);
+      message.error('Failed to fetch floors');
     }
   }, [API_URL]);
 
@@ -65,38 +63,33 @@ const BlockList = () => {
   const renderFloorGrid = (blockFloors, blockId) => {
     return (
       <List
-        grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4 }}
+        grid={{ gutter: 24, xs: 1, sm: 2, md: 2, lg: 3 }}
         dataSource={blockFloors}
         renderItem={(floor) => (
           <List.Item>
-            <Card
-              size="small"
-              title={
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>Floor {floor.floor_number}</span>
-                  <Tag color={getFloorTypeColor(floor.floor_type)}>
-                    {floor.floor_type}
-                  </Tag>
-                </div>
-              }
-              actions={[
-                <Button
-                  type="text"
-                  icon={<EditOutlined />}
-                  onClick={() => navigate(`/blocks/${blockId}/floors/edit/${floor.floor_id}`)}
-                >
-                  Edit
-                </Button>,
-                <Button
-                  type="text"
-                  icon={<HomeOutlined />}
-                  onClick={() => navigate(`/floors/${floor.floor_id}/apartments/`)}
-                >
-                View Apartments
-                </Button>
-              ]}
+            <Card 
+              className="rounded-xl shadow-sm hover:shadow-md transition-all"
+              bodyStyle={{ padding: '16px' }}
             >
-              <Card.Meta description={`Floor Type: ${floor.floor_type}`} />
+              <div className="bg-blue-500 text-white p-4 rounded-t-xl">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg font-medium">Floor {floor.floor_number}</span>
+                  <span className="bg-blue-400/50 px-3 py-1 rounded-full text-sm">
+                    {floor.floor_type}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="mt-4">
+                <Button
+                  type="text"
+                  icon={<HomeOutlined className="text-blue-500" />}
+                  onClick={() => navigate(`/blocks/${blockId}/floors/${floor.floor_id}/apartments/`)}
+                  className="w-full text-blue-500 hover:text-blue-600 border border-blue-500 rounded-lg flex items-center justify-center gap-2"
+                >
+                  View Apartment
+                </Button>
+              </div>
             </Card>
           </List.Item>
         )}
@@ -128,8 +121,8 @@ const BlockList = () => {
         <Space direction="vertical" style={{ width: '100%' }} size="large">
           {blocks.map((block) => {
             const blockFloors = floors[block.block_id] || [];
-            const floorCount = blockFloors.length;
-            
+            const floorCount = block.total_floor; // Giữ lại số tầng ban đầu
+
             return (
               <Card 
                 key={block.block_id}
@@ -150,12 +143,21 @@ const BlockList = () => {
                   </Button>
                 }
               >
+                <Text type="secondary" style={{ display: 'block', marginBottom: '12px' }}>
+                  {block.description || 'No description available for this block.'}
+                </Text>
+
                 <Collapse
                   expandIcon={({ isActive }) => 
                     <CaretRightOutlined rotate={isActive ? 90 : 0} />
                   }
                   activeKey={activeKey}
-                  onChange={(keys) => setActiveKey(keys)}
+                  onChange={(keys) => {
+                    setActiveKey(keys);
+                    if (keys.includes(block.block_id) && !floors[block.block_id]) {
+                      fetchFloors(block.block_id);
+                    }
+                  }}
                 >
                   <Panel 
                     key={block.block_id}

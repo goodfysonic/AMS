@@ -17,9 +17,9 @@ const BlockRoutes = () => {
             <Route path="/edit/:blockId" element={<BlockSavePage />} />
             <Route path="/:blockId/floors/new" element={<FloorSavePage />} />
             <Route path="/:blockId/floors/edit/:floorId" element={<FloorSavePage />} />
-            <Route path="/floors/:floorId/apartments" element={<ApartmentList />} />
-            <Route path="/apartments/new" element={<ApartmentSavePage />} />
-            <Route path="/apartments/:id/edit" element={<ApartmentSavePage />} />
+            <Route path="/:blockId/floors/:floorId/apartments" element={<ApartmentList />} />
+            <Route path="/:blockId/floors/:floorId/apartments/new" element={<ApartmentSavePage />} />
+            <Route path="/:blockId/floors/:floorId/apartments/:id/edit" element={<ApartmentSavePage />} />
           </Routes>
         </div>
       </div>

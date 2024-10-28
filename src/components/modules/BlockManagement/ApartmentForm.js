@@ -1,126 +1,164 @@
-import React from 'react';
-import { Form, Input, Button, Select, Row, Col } from 'antd';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, Select, Row, Col, Card, DatePicker, Checkbox } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 const { Option } = Select;
 
-const ApartmentForm = ({ onSubmit, initialValues = {} }) => {
+const ApartmentForm = ({ 
+  onSubmit, 
+  initialValues = {}, 
+  loading = false, 
+  isEdit = false,
+  onCancel
+}) => {
   const [form] = Form.useForm();
-  const navigate = useNavigate(); // Khai báo useNavigate để điều hướng
+  const navigate = useNavigate();
+  
+  const [status, setStatus] = useState(initialValues?.status || 'AVAILABLE');
+
+  useEffect(() => {
+    if (initialValues) {
+      form.setFieldsValue({
+        ...initialValues,
+        sale_info: {
+          ...initialValues.sale_info,
+          sale_date: initialValues.sale_info?.sale_date ? moment(initialValues.sale_info.sale_date) : null,
+        },
+        furniture: initialValues.furniture || false,
+      });
+      setStatus(initialValues.status || 'AVAILABLE');
+    }
+  }, [initialValues, form]);
 
   const handleFinish = (values) => {
-    onSubmit(values);
+    const transformedValues = {
+      name: values.name,
+      area: values.area,
+      furniture: values.furniture || false,
+      sale_info: {
+        purchase_price: values.sale_info?.purchase_price || null,
+        sale_date: values.sale_info?.sale_date ? values.sale_info.sale_date.toISOString() : null,
+      },
+      status: values.status,
+    };
+
+    onSubmit(transformedValues);
   };
 
   const handleCancel = () => {
-    form.resetFields(); // Xóa các trường đã nhập
-    navigate('/apartments'); // Điều hướng trở lại trang danh sách căn hộ
+    form.resetFields();
+    if (onCancel) {
+      onCancel();
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const handleStatusChange = (value) => {
+    setStatus(value);
+    if (value === 'SOLD') {
+      form.setFieldsValue({
+        sale_info: { purchase_price: null, sale_date: null },
+      });
+    }
   };
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-md">
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFinish}
-        initialValues={initialValues}
-      >
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              label="Name"
-              name="name"
-              rules={[{ required: true, message: 'Please enter apartment name' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+    <div className="p-6">
+      <Card className="shadow-md">
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleFinish}
+          initialValues={initialValues}
+          disabled={loading}
+        >
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Apartment Name"
+                name="name"
+                rules={[{ required: true, message: 'Please enter apartment name' }]}
+              >
+                <Input placeholder="Enter apartment name" />
+              </Form.Item>
+            </Col>
 
-          <Col span={12}>
-            <Form.Item
-              label="Purchase price"
-              name="purchasePrice"
-              rules={[{ required: true, message: 'Please enter purchase price' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Area (sqm)"
+                name="area"
+                rules={[{ required: true, message: 'Please enter area' }]}
+              >
+                <Input type="number" placeholder="Enter area in sqm" />
+              </Form.Item>
+            </Col>
 
-          <Col span={12}>
-            <Form.Item
-              label="Rental price"
-              name="rentalPrice"
-              rules={[{ required: true, message: 'Please enter rental price' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Furniture"
+                name="furniture"
+                valuePropName="checked"
+              >
+                <Checkbox>Has Furniture</Checkbox>
+              </Form.Item>
+            </Col>
 
-          <Col span={12}>
-            <Form.Item
-              label="Floor"
-              name="floor"
-              rules={[{ required: true, message: 'Please enter floor' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Sale Price"
+                name={['sale_info', 'purchase_price']}
+              >
+                <Input 
+                  type="number" 
+                  placeholder="Enter sale price"
+                  disabled={status === 'SOLD'} 
+                />
+              </Form.Item>
+            </Col>
 
-          <Col span={12}>
-            <Form.Item
-              label="Area"
-              name="area"
-              rules={[{ required: true, message: 'Please enter area' }]}
-            >
-              <Input />
-            </Form.Item>
-          </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Sale Date"
+                name={['sale_info', 'sale_date']}
+              >
+                <DatePicker 
+                  style={{ width: '100%' }} 
+                  placeholder="Select sale date"
+                  disabled={status === 'SOLD'}
+                />
+              </Form.Item>
+            </Col>
 
-          <Col span={12}>
-            <Form.Item
-              label="Rental type"
-              name="rentalType"
-              rules={[{ required: true, message: 'Please select rental type' }]}
-            >
-              <Select>
-                <Option value="month">Month</Option>
-                <Option value="year">Year</Option>
-              </Select>
-            </Form.Item>
-          </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Apartment Status"
+                name="status"
+                rules={[{ required: true, message: 'Please select apartment status' }]}
+              >
+                <Select 
+                  placeholder="Select status"
+                  onChange={handleStatusChange}
+                  value={status}
+                >
+                  <Option value="AVAILABLE">Available</Option>
+                  <Option value="SOLD">Sold</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Col span={12}>
-            <Form.Item
-              label="Apartment status"
-              name="status"
-              rules={[{ required: true, message: 'Please select apartment status' }]}
-            >
-              <Select>
-                <Option value="available">Available</Option>
-                <Option value="rented">Rented</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Form.Item className="text-center">
-          <Button
-            type="default"
-            style={{ backgroundColor: '#469FD1', color: 'white', border: 'none' }}
-            className="mr-4"
-            onClick={handleCancel}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{ backgroundColor: '#469FD1', borderColor: '#469FD1' }}
-          >
-            Add
-          </Button>
-        </Form.Item>
-      </Form>
+          <div className="flex justify-end space-x-4 mt-6">
+            <Button onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              {isEdit ? 'Update Apartment' : 'Add Apartment'}
+            </Button>
+          </div>
+        </Form>
+      </Card>
     </div>
   );
 };

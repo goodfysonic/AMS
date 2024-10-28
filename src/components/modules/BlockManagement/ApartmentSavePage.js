@@ -1,33 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message, Spin } from 'antd';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Typography, message, Spin } from 'antd';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ApartmentForm from './ApartmentForm';
+
+const { Title } = Typography;
 
 const ApartmentSavePage = () => {
-  const { id } = useParams(); // Get ID if editing
+  const { blockId, floorId, id } = useParams();
   const navigate = useNavigate();
+  
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
-  const location = useLocation();
-  const { floorId } = location.state || {};
-
-  const API_URL = 'http://localhost:8080/master/api';
+  const [apartmentData, setApartmentData] = useState(null);
+  
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/master/api';
 
   useEffect(() => {
     if (id) {
-      // Fetch apartment details if editing
-      fetchApartmentDetails(id);
+      fetchApartmentDetails();
     }
   }, [id]);
 
-  const fetchApartmentDetails = async (apartmentId) => {
+  const fetchApartmentDetails = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/apartments/${apartmentId}`, {
+      const response = await axios.get(`${API_URL}/apartments/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      form.setFieldsValue(response.data);
+      setApartmentData(response.data);
     } catch (error) {
       console.error('Failed to fetch apartment details:', error);
       message.error('Failed to fetch apartment details');
@@ -36,24 +37,33 @@ const ApartmentSavePage = () => {
     }
   };
 
-  const onFinish = async (values) => {
+  const handleSubmit = async (values) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const payload = {
+        name: values.name,
+        area: values.area,
+        status: values.status,
+        furniture: values.furniture || false,
+        sale_info: {
+          purchase_price: values.sale_info?.purchase_price || null,
+          sale_date: values.sale_info?.sale_date ? values.sale_info.sale_date.toISOString() : null,
+        },
+      };
+
       if (id) {
-        // Edit existing apartment
-        await axios.put(`${API_URL}/apartments/${id}`, values, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        payload.apartment_id = id;
+        await axios.put(`${API_URL}/apartments/${id}`, payload, { headers });
         message.success('Apartment updated successfully');
       } else {
-        // Add new apartment and associate with floorId
-        await axios.post(`${API_URL}/apartments`, { ...values, floorId }, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        payload.floor_id = floorId;
+        await axios.post(`${API_URL}/apartments`, payload, { headers });
         message.success('Apartment added successfully');
       }
-      navigate(`/floors/${floorId}/apartments`); 
+      navigate(`/blocks/${blockId}/floors/${floorId}/apartments`);
     } catch (error) {
       console.error('Failed to save apartment:', error);
       message.error('Failed to save apartment');
@@ -62,52 +72,30 @@ const ApartmentSavePage = () => {
     }
   };
 
+  const handleCancel = () => {
+    navigate(`/blocks/${blockId}/floors/${floorId}/apartments`);
+  };
+
+  if (loading && id && !apartmentData) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
-    <div className="p-8 bg-white shadow rounded">
-      <h2>{id ? 'Edit Apartment' : 'Add New Apartment'}</h2>
-      <Spin spinning={loading}>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-        >
-          <Form.Item
-            name="name"
-            label="Apartment Name"
-            rules={[{ required: true, message: 'Please enter the apartment name' }]}
-          >
-            <Input placeholder="Enter apartment name" />
-          </Form.Item>
-
-          <Form.Item
-            name="area"
-            label="Area (sqm)"
-            rules={[{ required: true, message: 'Please enter the area' }]}
-          >
-            <Input placeholder="Enter area in sqm" />
-          </Form.Item>
-
-          <Form.Item
-            name={['rental_info', 'rental_price']}
-            label="Rental Price"
-          >
-            <Input placeholder="Enter rental price" />
-          </Form.Item>
-
-          <Form.Item
-            name="status"
-            label="Status"
-          >
-            <Input placeholder="Enter status (Available, Rented, Sold)" />
-          </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              {id ? 'Update Apartment' : 'Add Apartment'}
-            </Button>
-          </Form.Item>
-        </Form>
-      </Spin>
+    <div className="p-6">
+      <Title level={3} className="mb-6">
+        {id ? 'Edit Apartment' : 'Add New Apartment'}
+      </Title>
+      <ApartmentForm
+        initialValues={apartmentData}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        loading={loading}
+        isEdit={!!id}
+      />
     </div>
   );
 };

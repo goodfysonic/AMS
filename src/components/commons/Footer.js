@@ -1,35 +1,46 @@
 import React from 'react';
+import { FacebookOutlined, TwitterOutlined, LinkedinOutlined } from '@ant-design/icons';
 
 const Footer = () => {
   return (
-    <footer style={{ backgroundColor: '#469FD1', color: 'white', padding: '18px 32px' }}> 
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex justify-between gap-16 text-sm">
-          <div className="w-full sm:w-1/3 mb-4">
-            <h3 className="font-semibold">About AMS</h3>
-            <p>AMS is a modern apartment management system, designed to streamline management processes and improve resident experiences.</p>
-          </div>
-          <div className="w-full sm:w-1/3 mb-4">
-            <h3 className="font-semibold">Contact Us</h3>
-            <ul>
-              <li>Email: info@ams.com</li>
-              <li>Phone: (84) 123-456-789</li>
-              <li>Address: 123 ABC Street, XYZ District, HCMC</li>
-            </ul>
-          </div>
-          <div className="w-full sm:w-1/3 mb-4">
-            <h3 className="font-semibold">Quick Links</h3>
-            <ul>
-              <li><a href="#" className="hover:underline">Home</a></li>
-              <li><a href="#" className="hover:underline">Services</a></li>
-              <li><a href="#" className="hover:underline">News</a></li>
-              <li><a href="#" className="hover:underline">Contact</a></li>
-            </ul>
-          </div>
+    <footer className="w-full bg-blue-600 text-white py-6">
+      <div className="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
+        
+        {/* Logo và Mô tả ngắn */}
+        <div className="text-center lg:text-left">
+          <h1 className="text-lg font-bold">AMS</h1>
+          <p className="text-xs">Apartment Management System</p>
         </div>
-        <div className="text-center mt-4 text-xs">
-          <p>&copy; {new Date().getFullYear()} AMS - Apartment Management System. All rights reserved.</p>
+
+        {/* Quick Links */}
+        <div className="flex space-x-6 text-sm">
+          <a href="/dashboard" className="hover:text-gray-300 transition">Dashboard</a>
+          <a href="/about" className="hover:text-gray-300 transition">About Us</a>
+          <a href="/services" className="hover:text-gray-300 transition">Services</a>
+          <a href="/contact" className="hover:text-gray-300 transition">Contact</a>
         </div>
+
+        {/* Social Icons */}
+        <div className="flex space-x-4">
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+            <FacebookOutlined className="text-lg hover:text-gray-300 transition" />
+          </a>
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
+            <TwitterOutlined className="text-lg hover:text-gray-300 transition" />
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+            <LinkedinOutlined className="text-lg hover:text-gray-300 transition" />
+          </a>
+        </div>
+      </div>
+
+      {/* Dòng cuối nhỏ */}
+      <div className="text-center mt-4 text-xs text-gray-200">
+        © 2024 Apartment Management System. All rights reserved.
+        <span className="px-2">|</span>
+        <a href="/privacy-policy" className="hover:text-gray-300 transition">Privacy Policy</a>
+        <span className="px-2">|</span>
+        <a href="/terms" className="hover:text-gray-300 transition">Terms of Service</a>
       </div>
     </footer>
   );
