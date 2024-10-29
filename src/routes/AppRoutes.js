@@ -16,21 +16,18 @@ import Header from '../components/commons/Header';
 
 const AppRoutes = () => {
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Header - Full Width */}
+    <div className="flex flex-col h-screen bg-gray-50">
       <header className="fixed top-0 left-0 w-full h-16 bg-blue-600 text-white shadow-md z-30">
         <Header />
       </header>
 
-      {/* Sidebar - Fixed Position */}
-      <aside className="fixed top-16 left-0 w-72 h-[calc(100vh-4rem-5rem)] bg-white shadow-lg z-20 overflow-y-auto">
-        <Sidebar />
-      </aside>
+      <div className="flex flex-grow pt-16">
+        <aside className="fixed top-16 left-0 w-72 h-[calc(100vh-4rem-5rem)] bg-white shadow-lg z-20 overflow-y-auto">
+          <Sidebar />
+        </aside>
 
-      {/* Main Content Wrapper */}
-      <div className="flex-1 flex flex-col ml-72 mt-16 mb-20"> {/* Tăng margin bottom */}
-        <main className="flex-1 flex flex-col">
-          <div className="max-w-7xl mx-auto p-6 flex-grow overflow-y-auto">
+        <main className="flex-1 ml-72 p-6 overflow-y-auto">
+          <div className="max-w-7xl mx-auto">
             <Routes>
               <Route path="/" element={<BlockList />} />
               <Route path="/blocks/*" element={<BlockRoutes />} />
@@ -47,9 +44,8 @@ const AppRoutes = () => {
         </main>
       </div>
 
-      {/* Footer - Full Width */}
-      <footer className="fixed bottom-0 left-0 w-full h-20 bg-blue-600 text-white shadow-lg z-30 border-t-4 border-blue-700"> {/* Thay đổi ở đây */}
-        <div className="h-full bg-gradient-to-b from-blue-600 to-blue-700"> {/* Thêm gradient */}
+      <footer className="fixed bottom-0 left-0 w-full h-20 bg-blue-600 text-white shadow-lg z-30 border-t-4 border-blue-700">
+        <div className="h-full bg-gradient-to-b from-blue-600 to-blue-700">
           <Footer />
         </div>
       </footer>

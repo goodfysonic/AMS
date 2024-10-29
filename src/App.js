@@ -28,7 +28,7 @@ function App() {
     <div className="App">
       {isAuthenticated ? (
         <>
-          <Header setIsAuthenticated={setIsAuthenticated} onLogout={handleLogout} /> 
+          {/* <Header setIsAuthenticated={setIsAuthenticated} onLogout={handleLogout} />  */}
           <AppRoutes />
         </>
       ) : (
