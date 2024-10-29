@@ -65,7 +65,7 @@ const ServiceList = () => {
 
   const columns = [
     {
-      title: 'Name',
+      title: 'Service Name',
       dataIndex: 'name',
       key: 'name',
       render: (text) => (
@@ -83,14 +83,15 @@ const ServiceList = () => {
     {
       title: 'Unit',
       dataIndex: 'unit',
-      key: 'unit'
+      key: 'unit',
+      render: (unit) => <Tag color="blue">{unit}</Tag>,
     },
     {
-      title: 'Metered Service',
+      title: 'Type',
       dataIndex: 'meteredService',
       key: 'meteredService',
       render: (metered) => (
-        <Tag color={metered ? 'green' : 'blue'}>
+        <Tag color={metered ? 'green' : 'red'}>
           {metered ? 'Metered' : 'Non-Metered'}
         </Tag>
       ),
@@ -101,7 +102,7 @@ const ServiceList = () => {
       onFilter: (value, record) => record.meteredService === value,
     },
     {
-      title: 'Action',
+      title: 'Actions',
       key: 'action',
       render: (_, record) => (
         <Space>
@@ -133,27 +134,29 @@ const ServiceList = () => {
 
   return (
     <div className="p-6 max-w-[1400px] mx-auto">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 gap-4">
         <Title level={2} className="flex items-center gap-2 !mb-0">
           <ToolOutlined /> Service Management
         </Title>
-        <Space>
-          <Input.Search
-            placeholder="Search service..."
+        <div className="flex gap-2">
+          <Input
+            placeholder="Search services..."
             allowClear
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            onSearch={handleSearch}
+            onPressEnter={handleSearch}
             className="w-64"
+            suffix={<SearchOutlined onClick={handleSearch} />}
           />
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => navigate('/services/new')}
+            className="bg-blue-600 hover:bg-blue-500"
           >
             Add New Service
           </Button>
-        </Space>
+        </div>
       </div>
 
       <Card className="shadow-sm">
@@ -165,7 +168,7 @@ const ServiceList = () => {
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            showTotal: (total) => `Total ${total} items`
+            showTotal: (total) => `Total ${total} services`
           }}
         />
       </Card>
@@ -192,8 +195,8 @@ const ServiceList = () => {
               <Descriptions.Item label="Unit" span={3}>
                 {selectedService.unit}
               </Descriptions.Item>
-              <Descriptions.Item label="Service Type" span={3}>
-                <Tag color={selectedService.meteredService ? 'green' : 'blue'}>
+              <Descriptions.Item label="Type" span={3}>
+                <Tag color={selectedService.meteredService ? 'green' : 'red'}>
                   {selectedService.meteredService ? 'Metered' : 'Non-Metered'}
                 </Tag>
               </Descriptions.Item>
