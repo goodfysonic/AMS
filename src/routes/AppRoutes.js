@@ -22,11 +22,11 @@ const AppRoutes = () => {
       </header>
 
       <div className="flex flex-grow pt-16">
-        <aside className="fixed top-16 left-0 w-72 h-[calc(100vh-4rem-5rem)] bg-white shadow-lg z-20 overflow-y-auto">
+        <aside className="fixed top-16 left-0 w-72 h-[calc(100vh-4rem-5rem)] bg-white shadow-lg z-20 overflow-y-auto scrollbar-hide">
           <Sidebar />
         </aside>
 
-        <main className="flex-1 ml-72 p-6 overflow-y-auto">
+        <main className="flex-1 ml-72 p-6 overflow-y-auto scrollbar-hide">
           <div className="max-w-7xl mx-auto">
             <Routes>
               <Route path="/" element={<BlockList />} />
