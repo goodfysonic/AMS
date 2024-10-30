@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, message } from 'antd';
 import axios from 'axios';
-import InvoiceForm from '../InvoiceManagement/InVoiceForm';
+import InvoiceForm from './InvoiceForm';
 
 const { Title } = Typography;
 
