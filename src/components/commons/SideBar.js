@@ -64,14 +64,14 @@ const Sidebar = () => {
                     active={location.pathname.startsWith('/residents/renters')}
                     subItem 
                   />
-                  <SidebarItem 
+                  {/* <SidebarItem 
                     icon={<DollarSign size={18} />} 
                     text="Household Management" 
                     subText="Financial records for households"
                     to="/residents/households" 
                     active={location.pathname.startsWith('/residents/households')}
                     subItem 
-                  />
+                  /> */}
                 </div>
               )}
             </div>

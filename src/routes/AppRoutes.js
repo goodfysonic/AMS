@@ -10,13 +10,13 @@ import UserRoutes from '../components/modules/AccountManagement/UserManagement/r
 import OwnerRoutes from '../components/modules/ResidentManagement/OwnerManagement/routes';
 import RenterRoutes from '../components/modules/ResidentManagement/RenterManagement/routes';
 import HouseholdRoutes from '../components/modules/ResidentManagement/HouseholdManagement/routes';
-import Sidebar from '../components/commons/SideBar'; 
-import Footer from '../components/commons/Footer'; 
+import Sidebar from '../components/commons/SideBar';
+import Footer from '../components/commons/Footer';
 import Header from '../components/commons/Header';
 
 const AppRoutes = () => {
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen">
       <header className="fixed top-0 left-0 w-full h-16 bg-blue-600 text-white shadow-md z-30">
         <Header />
       </header>
@@ -26,7 +26,7 @@ const AppRoutes = () => {
           <Sidebar />
         </aside>
 
-        <main className="flex-1 ml-72 p-6 overflow-y-auto scrollbar-hide">
+        <main className="flex-1 ml-72 p-6 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 8rem)' }}>
           <div className="max-w-7xl mx-auto">
             <Routes>
               <Route path="/" element={<BlockList />} />
@@ -34,11 +34,11 @@ const AppRoutes = () => {
               <Route path="/invoices/*" element={<InvoiceRoutes />} />
               <Route path="/services/*" element={<ServiceRoutes />} />
               <Route path="/contracts/*" element={<ContractRoutes />} />
-              <Route path="/profile" element={<Profile />} /> 
+              <Route path="/profile" element={<Profile />} />
               <Route path="/users/*" element={<UserRoutes />} />
               <Route path="/residents/owners/*" element={<OwnerRoutes />} />
               <Route path="/residents/renters/*" element={<RenterRoutes />} />
-              <Route path="/residents/households/*" element={<HouseholdRoutes />} />
+              {/* <Route path="/residents/households/*" element={<HouseholdRoutes />} /> */}
             </Routes>
           </div>
         </main>

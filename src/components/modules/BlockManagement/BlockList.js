@@ -31,15 +31,27 @@ const BlockList = () => {
     }
   }, [API_URL]);
 
-  const fetchFloors = useCallback(async (blockId) => {
+  const fetchFloors = useCallback(async (blockId, totalFloors) => {
     try {
       const token = localStorage.getItem('token');
       const floorsResponse = await axios.get(`${API_URL}/blocks/${blockId}/floors`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setFloors(prev => ({ 
-        ...prev, 
-        [blockId]: floorsResponse.data 
+      let fetchedFloors = floorsResponse.data;
+
+      if (fetchedFloors.length < totalFloors) {
+        const placeholders = Array.from({ length: totalFloors - fetchedFloors.length }, (_, index) => ({
+          floor_number: fetchedFloors.length + index + 1,
+          floor_type: 'COMMERCIAL',
+          floor_id: `placeholder-${fetchedFloors.length + index + 1}`,
+          isPlaceholder: true,
+        }));
+        fetchedFloors = [...fetchedFloors, ...placeholders];
+      }
+
+      setFloors(prev => ({
+        ...prev,
+        [blockId]: fetchedFloors,
       }));
     } catch (error) {
       console.error('Error:', error);
@@ -52,6 +64,7 @@ const BlockList = () => {
   }, [fetchBlocks]);
 
   const getFloorTypeColor = (type) => {
+    if (!type) return 'default';
     switch (type.toUpperCase()) {
       case 'COMMERCIAL': return 'blue';
       case 'RESIDENTIAL': return 'green';
@@ -74,22 +87,24 @@ const BlockList = () => {
               <div className="bg-blue-500 text-white p-4 rounded-t-xl">
                 <div className="flex items-center gap-3">
                   <span className="text-lg font-medium">Floor {floor.floor_number}</span>
-                  <span className="bg-blue-400/50 px-3 py-1 rounded-full text-sm">
+                  <span className={`bg-${getFloorTypeColor(floor.floor_type)}-400/50 px-3 py-1 rounded-full text-sm`}>
                     {floor.floor_type}
                   </span>
                 </div>
               </div>
               
-              <div className="mt-4">
-                <Button
-                  type="text"
-                  icon={<HomeOutlined className="text-blue-500" />}
-                  onClick={() => navigate(`/blocks/${blockId}/floors/${floor.floor_id}/apartments/`)}
-                  className="w-full text-blue-500 hover:text-blue-600 border border-blue-500 rounded-lg flex items-center justify-center gap-2"
-                >
-                  View Apartment
-                </Button>
-              </div>
+              {floor.floor_id && (
+                <div className="mt-4">
+                  <Button
+                    type="text"
+                    icon={<HomeOutlined className="text-blue-500" />}
+                    onClick={() => navigate(`/blocks/${blockId}/floors/${floor.floor_id}/apartments/`)}
+                    className="w-full text-blue-500 hover:text-blue-600 border border-blue-500 rounded-lg flex items-center justify-center gap-2"
+                  >
+                    View Apartment
+                  </Button>
+                </div>
+              )}
             </Card>
           </List.Item>
         )}
@@ -121,7 +136,7 @@ const BlockList = () => {
         <Space direction="vertical" style={{ width: '100%' }} size="large">
           {blocks.map((block) => {
             const blockFloors = floors[block.block_id] || [];
-            const floorCount = block.total_floor; // Giữ lại số tầng ban đầu
+            const floorCount = block.total_floor;
 
             return (
               <Card 
@@ -155,7 +170,7 @@ const BlockList = () => {
                   onChange={(keys) => {
                     setActiveKey(keys);
                     if (keys.includes(block.block_id) && !floors[block.block_id]) {
-                      fetchFloors(block.block_id);
+                      fetchFloors(block.block_id, floorCount);
                     }
                   }}
                 >

@@ -1,14 +1,48 @@
 import React from 'react';
-import { Form, Input, InputNumber, Button } from 'antd';
+import { Form, InputNumber, Button, Select, message } from 'antd';
+import axios from 'axios';
 
-const FloorForm = ({ initialValues, onFinish, loading }) => {
+const { Option } = Select;
+
+const FloorForm = ({ initialValues, onFinish, loading, blockId, onAddFloor }) => {
   const [form] = Form.useForm();
+
+  const handleFinish = async (values) => {
+    try {
+      const token = localStorage.getItem('token');
+
+      // Thêm blockId vào payload
+      const payload = {
+        ...values,
+        block_id: blockId,
+      };
+
+      const response = await axios.post(`http://localhost:8080/master/api/floors`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      message.success('Floor added successfully');
+      form.resetFields();
+      
+      // Gọi callback để cập nhật danh sách tầng trong BlockList
+      if (onAddFloor) {
+        onAddFloor(response.data);
+      }
+
+      if (onFinish) {
+        onFinish();
+      }
+    } catch (error) {
+      message.error('Failed to add floor');
+    }
+  };
 
   return (
     <Form
       form={form}
       layout="vertical"
-      onFinish={onFinish}
+      onFinish={handleFinish}
       initialValues={initialValues}
     >
       <Form.Item
@@ -22,9 +56,13 @@ const FloorForm = ({ initialValues, onFinish, loading }) => {
       <Form.Item
         name="floor_type"
         label="Floor Type"
-        rules={[{ required: true, message: 'Please input floor type!' }]}
+        rules={[{ required: true, message: 'Please select floor type!' }]}
       >
-        <Input placeholder="Enter floor type" />
+        <Select placeholder="Select floor type" style={{ width: '100%' }}>
+          <Option value="RESIDENTIAL">Resident</Option>
+          <Option value="COMMERCIAL">Commercial</Option>
+          <Option value="TECHNICAL">Technical</Option>
+        </Select>
       </Form.Item>
 
       <Form.Item>

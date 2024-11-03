@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Row, Col, Checkbox, Divider, DatePicker, InputNumber, Card } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, Button, Select, Row, Col, Checkbox, Divider, DatePicker, InputNumber, Card, message } from 'antd';
 import moment from 'moment';
-import 'tailwindcss/tailwind.css';
 
 const { Option } = Select;
 
-const ApartmentForm = ({
+const EditApartmentForm = ({
   onSubmit,
   initialValues = {},
   loading = false,
-  isEdit = false,
   onCancel,
   floorId,
+  apartmentNames = [],
 }) => {
   const [form] = Form.useForm();
   const [status, setStatus] = useState(initialValues?.status || 'AVAILABLE');
+  const [nameError, setNameError] = useState('');
 
   useEffect(() => {
     if (initialValues) {
@@ -25,19 +25,31 @@ const ApartmentForm = ({
           purchase_price: initialValues?.sale_info?.purchase_price,
           sale_date: initialValues?.sale_info?.sale_date ? moment(initialValues.sale_info.sale_date) : null,
         },
+        number_of_bedroom: initialValues?.number_of_bedroom || 1,
+        number_of_bathroom: initialValues?.number_of_bathroom || 1,
       });
+      setStatus(initialValues.status || 'AVAILABLE');
     }
   }, [initialValues, form]);
 
-  const handleFinish = (values) => {
+  const handleFinish = async (values) => {
+    setNameError('');
+
+    if (apartmentNames.includes(values.name) && values.name !== initialValues.name) {
+      setNameError('This apartment name already exists. Please choose a different name.');
+      return;
+    }
+
     const transformedValues = {
       ...values,
-      status: status,
+      status,
       floor_id: floorId,
       sale_info: {
         purchase_price: values.sale_info?.purchase_price || 0,
         sale_date: values.sale_info?.sale_date ? values.sale_info.sale_date.toISOString() : null,
       },
+      number_of_bedroom: values.number_of_bedroom,
+      number_of_bathroom: values.number_of_bathroom,
     };
     onSubmit(transformedValues);
   };
@@ -49,11 +61,10 @@ const ApartmentForm = ({
           form={form}
           layout="vertical"
           onFinish={handleFinish}
-          initialValues={initialValues}
           disabled={loading}
           className="space-y-6"
         >
-          <h2 className="text-2xl font-semibold text-center mb-6">Apartment Details</h2>
+          <h2 className="text-2xl font-semibold text-center mb-6">Edit Apartment Details</h2>
           
           <Row gutter={16}>
             <Col span={12}>
@@ -61,6 +72,8 @@ const ApartmentForm = ({
                 label="Apartment Name"
                 name="name"
                 rules={[{ required: true, message: 'Please enter apartment name' }]}
+                validateStatus={nameError ? 'error' : ''}
+                help={nameError}
               >
                 <Input />
               </Form.Item>
@@ -83,15 +96,32 @@ const ApartmentForm = ({
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item
-                label="Status"
-                name="status"
-                rules={[{ required: true, message: 'Please select status' }]}
-              >
-                <Select onChange={(value) => setStatus(value)}>
+              <Form.Item label="Status" name="status">
+                <Select value={status} onChange={(value) => setStatus(value)}>
                   <Option value="AVAILABLE">Available</Option>
                   <Option value="SOLD">Sold</Option>
                 </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Number of Bedrooms"
+                name="number_of_bedroom"
+                rules={[{ required: true, message: 'Please enter the number of bedrooms' }]}
+              >
+                <InputNumber min={1} style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                label="Number of Bathrooms"
+                name="number_of_bathroom"
+                rules={[{ required: true, message: 'Please enter the number of bathrooms' }]}
+              >
+                <InputNumber min={1} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
           </Row>
@@ -230,7 +260,7 @@ const ApartmentForm = ({
               Cancel
             </Button>
             <Button type="primary" htmlType="submit" loading={loading}>
-              {isEdit ? 'Save Changes' : 'Add Apartment'}
+              Save Changes
             </Button>
           </div>
         </Form>
@@ -239,4 +269,4 @@ const ApartmentForm = ({
   );
 };
 
-export default ApartmentForm;
+export default EditApartmentForm

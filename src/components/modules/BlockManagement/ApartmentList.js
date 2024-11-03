@@ -28,15 +28,13 @@ import {
 } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
-const API_URL =
-  process.env.REACT_APP_API_URL || "http://localhost:8080/master/api";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080/master/api";
 
 const ApartmentList = () => {
   const [apartments, setApartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { blockId, floorId } = useParams();
-
 
   const fetchApartments = useCallback(async () => {
     if (!floorId) return;
@@ -82,12 +80,13 @@ const ApartmentList = () => {
     status === "AVAILABLE" ? { color: "#52c41a" } : { color: "#fa8c16" };
 
   const renderPrice = (status, saleInfo) => {
-    if (status === "SOLD" || !saleInfo?.purchase_price) return "N/A";
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-    }).format(saleInfo.purchase_price);
+    return saleInfo?.purchase_price
+      ? new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 0,
+        }).format(saleInfo.purchase_price)
+      : "$0";
   };
 
   const ApartmentCard = ({ apartment }) => {
@@ -175,11 +174,19 @@ const ApartmentList = () => {
             </div>
             <div className="flex justify-between items-center text-gray-600">
               <Text>Area:</Text>
-              <Text strong>{apartment?.area} sqm</Text>
+              <Text strong>{apartment?.area || "0"} sqm</Text>
             </div>
             <div className="flex justify-between items-center text-gray-600">
               <Text>Furniture:</Text>
               <Text strong>{apartment?.furniture ? "Yes" : "No"}</Text>
+            </div>
+            <div className="flex justify-between items-center text-gray-600">
+              <Text>Bedrooms:</Text>
+              <Text strong>{apartment?.number_of_bedroom ?? "0"}</Text>
+            </div>
+            <div className="flex justify-between items-center text-gray-600">
+              <Text>Bathrooms:</Text>
+              <Text strong>{apartment?.number_of_bathroom ?? "0"}</Text>
             </div>
           </div>
         </div>

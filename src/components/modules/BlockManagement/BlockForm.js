@@ -12,39 +12,39 @@ const BlockForm = ({ initialValues, onFinish, loading }) => {
       initialValues={initialValues}
     >
       <Form.Item
+        name="description"
+        label="Description"
+        rules={[{ required: true, message: 'Please enter a description!' }]}
+      >
+        <Input placeholder="Enter block description" />
+      </Form.Item>
+
+      <Form.Item
         name="name"
-        label="Block Name"
-        rules={[{ required: true, message: 'Please input block name!' }]}
+        label="Name"
+        rules={[{ required: true, message: 'Please enter the block name!' }]}
       >
         <Input placeholder="Enter block name" />
       </Form.Item>
 
       <Form.Item
-        name="description"
-        label="Description"
-        rules={[{ required: true, message: 'Please input description!' }]}
-      >
-        <Input.TextArea rows={4} placeholder="Enter description" />
-      </Form.Item>
-
-      <Form.Item
-        name="total_apartment"
-        label="Total Apartments"
-        rules={[{ required: true, message: 'Please input total apartments!' }]}
-      >
-        <InputNumber min={0} placeholder="Enter total apartments" style={{ width: '100%' }} />
-      </Form.Item>
-
-      <Form.Item
         name="total_floor"
         label="Total Floors"
-        rules={[{ required: true, message: 'Please input total floors!' }]}
+        rules={[{ required: true, message: 'Please enter the total number of floors!' }]}
       >
-        <InputNumber min={0} placeholder="Enter total floors" style={{ width: '100%' }} />
+        <InputNumber min={1} placeholder="Enter total floors" style={{ width: '100%' }} />
+      </Form.Item>
+
+      <Form.Item
+        name="apartment_per_floor"
+        label="Apartments Per Floor"
+        rules={[{ required: true, message: 'Please enter the number of apartments per floor!' }]}
+      >
+        <InputNumber min={1} placeholder="Enter apartments per floor" style={{ width: '100%' }} />
       </Form.Item>
 
       <Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading}>
+        <Button type="primary" htmlType="submit" loading={loading} disabled={loading}>
           Submit
         </Button>
       </Form.Item>
